@@ -27,6 +27,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strings"
 )
 
 /*
@@ -64,18 +65,23 @@ func main() {
 
 	// print contents
 	fmt.Printf("%s", txt)
-
+	fmt.Printf("\n\n")
 	// split by line
-	//lines := strings.Split(txt, "\n")
+	lines := strings.Split(txt, "\n")
 
 	// remove comments
-	/*for i, line := range lines {
+	for i, line := range lines {
 		for j, char := range line {
 			if char == '#' {
-
+				lines[i] = line[0:j]
+				break
 			}
 		}
 	}
-	*/
+
+	// print without comments
+	for _, line := range lines {
+		fmt.Printf("%s\n", line)
+	}
 
 }
