@@ -62,7 +62,7 @@ func Fcfs(p parameters) string {
 		trav += Abs(cyl - at)
 		at = cyl
 	}
-	out += fmt.Sprintf("FCFS traversal count = %5d", trav)
+	out += fmt.Sprintf("FCFS traversal count = %5d\n", trav)
 
 	return out
 }
@@ -85,11 +85,11 @@ func FileToStr(file *os.File) string {
 func ParamsToString(params parameters) string {
 	var out string
 
-	out += fmt.Sprintf("Seek algorithm: %5s\n", params.alg)
+	out += fmt.Sprintf("Seek algorithm: %s\n", strings.ToUpper(params.alg))
 	out += fmt.Sprintf("\tLower cylinder: %5d\n", params.lowerCYL)
 	out += fmt.Sprintf("\tUpper cylinder: %5d\n", params.upperCYL)
-	out += fmt.Sprintf("\tInit cylinder: %5d\n", params.initCYL)
-	out += fmt.Sprintf("\tCylinder requests:")
+	out += fmt.Sprintf("\tInit cylinder:  %5d\n", params.initCYL)
+	out += fmt.Sprintf("\tCylinder requests:\n")
 	for _, req := range params.requests {
 		out += fmt.Sprintf("\t\tCylinder %5d\n", req)
 	}
@@ -216,7 +216,7 @@ func Run(p parameters) string {
 	// determine which alg to use
 	// maybe use code of alg
 	if p.alg == "fcfs" {
-		Fcfs(p)
+		output = Fcfs(p)
 	}
 
 	return output
@@ -258,8 +258,8 @@ func main() {
 	file.Close()
 
 	// print contents
-	fmt.Printf("%s", txt)
-	fmt.Printf("\n\n")
+	//fmt.Printf("%s", txt)
+	//fmt.Printf("\n\n")
 	// split by line
 	lines := strings.Split(txt, "\n")
 
@@ -288,7 +288,7 @@ func main() {
 	}
 
 	// check for invalid params
-
+	fmt.Printf("%s", ParamsToString(inParam))
 	fmt.Printf("%s", Run(inParam))
 
 }

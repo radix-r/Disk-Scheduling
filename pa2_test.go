@@ -6,7 +6,7 @@ var fcfs1 parameters = parameters{alg: "fcfs", lowerCYL: 0, upperCYL: 3000, init
 
 func TestFcfs(t *testing.T) {
 	var out string = Fcfs(fcfs1)
-	var exp string = "Servicing   300\nServicing   200\nServicing   100\nServicing   450\nServicing  2500\nServicing    38\nFCFS traversal count =  5335"
+	var exp string = "Servicing   300\nServicing   200\nServicing   100\nServicing   450\nServicing  2500\nServicing    38\nFCFS traversal count =  5335\n"
 
 	if out != exp {
 		t.Errorf("Expected %s, got %s", exp, out)
