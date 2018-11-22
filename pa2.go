@@ -42,6 +42,31 @@ type parameters struct {
 	requests []int
 }
 
+// Abs returns the absolute value of x.
+func Abs(x int) int {
+	if x < 0 {
+		return -x
+	}
+	return x
+}
+
+//
+func Fcfs(p parameters) string {
+	var out string = ""
+	var trav int = 0
+	var at int = p.initCYL
+
+	for _, cyl := range p.requests {
+		out += fmt.Sprintf("Servicing %5d\n", cyl)
+
+		trav += Abs(cyl - at)
+		at = cyl
+	}
+	out += fmt.Sprintf("FCFS traversal count = %5d", trav)
+
+	return out
+}
+
 /*
 This function takes in a file and returns its contents as a string
 Parameters File
@@ -188,6 +213,12 @@ func Parse(lines []string) (parameters, int) {
 func Run(p parameters) string {
 
 	var output string = ""
+	// determine which alg to use
+	// maybe use code of alg
+	if p.alg == "fcfs" {
+		Fcfs(p)
+	}
+
 	return output
 }
 
