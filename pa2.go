@@ -27,6 +27,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"sort"
 	"strconv"
 	"strings"
 )
@@ -50,18 +51,34 @@ func Abs(x int) int {
 	return x
 }
 
-//
-func Fcfs(p parameters) string {
-	var out string = ""
+/*
+Given a series of initial position and stops in the form of an int array,
+calculates the total traversal distance and accompanying output indicating each
+stop
+*/
+func CalcTrav(req []int, start int) (int, string) {
+	var at int = start
 	var trav int = 0
-	var at int = p.initCYL
+	var out string = ""
 
-	for _, cyl := range p.requests {
+	for _, cyl := range req {
 		out += fmt.Sprintf("Servicing %5d\n", cyl)
 
 		trav += Abs(cyl - at)
 		at = cyl
 	}
+	return trav, out
+}
+
+//
+func FCFS(p parameters) string {
+	var out string = ""
+	var trav int = 0
+	//var at int = p.initCYL
+	var o string
+	trav, o = CalcTrav(p.requests, p.initCYL)
+
+	out += o
 	out += fmt.Sprintf("FCFS traversal count = %5d\n", trav)
 
 	return out
@@ -80,6 +97,57 @@ func FileToStr(file *os.File) string {
 
 	}
 	return txt
+}
+
+/*
+given a sorted slice of integers retruns the value and index of element closest
+to target
+*/
+func FindClosest(nums []int, target int) (int, int) {
+
+	// binary search untill 2 items remain. calc diff from target. take item with
+	// smallest diff
+
+	var temp []int = nums
+	// to keep track of index through binary search. should be the corosponding
+	// original index of the 0th item in temp
+	var i int = 0
+	var val int = -1
+
+	for len(temp) > 2 {
+		var mid int = (len(temp) - 1) / 2
+		//fmt.Printf("%d : %d\n", mid, temp[mid])
+		if temp[mid] == target {
+			return target, (i + mid)
+		} else if temp[mid] > target {
+			temp = temp[:mid]
+		} else {
+			i = i + mid
+			temp = temp[mid:]
+		}
+	}
+
+	//fmt.Printf("%d\n", len(temp))
+	if len(temp) <= 0 {
+		val = -1
+		i = -1
+	} else if len(temp) == 1 {
+		val = temp[0]
+	} else { // len of temp must be 2 at this point
+		var d0 int = Abs(temp[0] - target)
+		var d1 int = Abs(temp[1] - target)
+
+		if d0 < d1 {
+			val = temp[0]
+			// i is unchanged
+			//i = i - 1
+		} else { // take the larger value on tie
+			val = temp[1]
+			i = i + 1
+		}
+	}
+
+	return val, i
 }
 
 func ParamsToString(params parameters) string {
@@ -210,13 +278,27 @@ func Parse(lines []string) (parameters, int) {
 	return p, 0
 }
 
+func RemoveComments(lines []string) []string {
+	for i, line := range lines {
+		for j, char := range line {
+			if char == '#' {
+				lines[i] = line[0:j]
+				break
+			}
+		}
+	}
+	return lines
+}
+
 func Run(p parameters) string {
 
 	var output string = ""
 	// determine which alg to use
 	// maybe use code of alg
 	if p.alg == "fcfs" {
-		output = Fcfs(p)
+		output = FCFS(p)
+	} else if p.alg == "sstf" {
+		output = SSTF(p)
 	}
 
 	return output
@@ -225,6 +307,37 @@ func Run(p parameters) string {
 /**/
 func Split(r rune) bool {
 	return r == ' ' || r == '\n' || r == '\t' || r == '\r' //|| r == '\n\r'
+}
+
+func SSTF(p parameters) string {
+	var output string = ""
+	var prev int = p.initCYL
+	var trav int
+	var i int
+	var next int = -1
+	var o string = ""
+	// create new thing to hold sstf ordered requests
+	var sstfOrder []int
+	// sort p.req
+	cpy := p.requests
+	sort.Ints(cpy)
+	// use binary searches to find next closest cyl req and its index in cpy
+	for len(cpy) > 0 {
+		next, i = FindClosest(cpy, prev)
+		sstfOrder = append(sstfOrder, next)
+		prev = next
+		// Remove the element at index i from cpy.
+		copy(cpy[i:], cpy[i+1:]) // Shift a[i+1:] left one index.
+		cpy[len(cpy)-1] = -1     // Erase last element (write zero value).
+		cpy = cpy[:len(cpy)-1]   // Truncate slice.
+
+	}
+	// find traversal dist of sstf ordered requests
+	trav, o = CalcTrav(sstfOrder, p.initCYL)
+	output += o
+
+	output += fmt.Sprintf("SSTF traversal count = %5d\n", trav)
+	return output
 }
 
 func ValidAlg(alg string) bool {
@@ -264,14 +377,7 @@ func main() {
 	lines := strings.Split(txt, "\n")
 
 	// remove comments
-	for i, line := range lines {
-		for j, char := range line {
-			if char == '#' {
-				lines[i] = line[0:j]
-				break
-			}
-		}
-	}
+	lines = RemoveComments(lines)
 
 	/*
 		// print without comments

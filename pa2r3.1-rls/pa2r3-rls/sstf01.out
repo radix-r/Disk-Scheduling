@@ -1,4 +1,4 @@
-Seek algorithm: FCFS
+Seek algorithm: SSTF
 	Lower cylinder:     0
 	Upper cylinder:  3000
 	Init cylinder:     27
@@ -9,10 +9,10 @@ Seek algorithm: FCFS
 		Cylinder   450
 		Cylinder  2500
 		Cylinder    38
-Servicing   300
-Servicing   200
+Servicing    38
 Servicing   100
+Servicing   200
+Servicing   300
 Servicing   450
 Servicing  2500
-Servicing    38
-FCFS traversal count =  5335
+SSTF traversal count =  2473

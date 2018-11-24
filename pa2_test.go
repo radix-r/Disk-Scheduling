@@ -1,16 +1,128 @@
 package main
 
-import "testing"
+import (
+	"log"
+	"os"
+	"path/filepath"
+	"strings"
+	"testing"
+)
 
 var fcfs1 parameters = parameters{alg: "fcfs", lowerCYL: 0, upperCYL: 3000, initCYL: 27, requests: []int{300, 200, 100, 450, 2500, 38}}
 
-func TestFcfs(t *testing.T) {
-	var out string = Fcfs(fcfs1)
+var files []string
+
+func init() {
+
+	var root string = "/pa2r3-rls/pa2r3-rls/"
+	var err = filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
+		files = append(files, path)
+		return nil
+	})
+	if err != nil {
+		panic(err)
+	}
+}
+
+func TestCalcTrav(t *testing.T) {
+
+	var nums []int = []int{1192,
+		1263,
+		1347,
+		1677,
+		2011,
+		2159,
+		2312,
+		2503,
+		2781,
+		2918,
+		2920,
+		3087,
+		3284,
+		3687,
+		4107,
+		4148,
+		4195,
+		4706,
+		930,
+		198,
+	}
+	res, _ := CalcTrav(nums, 1200)
+
+	if res != 8030 {
+		t.Error("Expected 8030, got", res)
+	}
+}
+
+func TestFCFS(t *testing.T) {
+	var out string = FCFS(fcfs1)
 	var exp string = "Servicing   300\nServicing   200\nServicing   100\nServicing   450\nServicing  2500\nServicing    38\nFCFS traversal count =  5335\n"
 
 	if out != exp {
 		t.Errorf("Expected %s, got %s", exp, out)
 	}
+}
+
+func TestFindClosest(t *testing.T) {
+	var l1 []int = []int{1, 2, 3, 8, 16, 20, 22}
+	var t1 int = 17
+	var i1 int = 4
+
+	outV, outI := FindClosest(l1, t1)
+
+	if outV != 16 {
+		t.Errorf("Expected 16, got %d", outV)
+	}
+
+	if outI != i1 {
+		t.Errorf("Expected %d, got %d", i1, outI)
+	}
+
+	outV, outI = FindClosest(l1, 9)
+	if outV != 8 {
+		t.Errorf("Expected 8, got %d", outV)
+	}
+
+	if outI != 3 {
+		t.Errorf("Expected 3, got %d", outI)
+	}
+
+	outV, outI = FindClosest(l1, 0)
+	if outV != 1 {
+		t.Errorf("Expected 1, got %d", outV)
+	}
+
+	if outI != 0 {
+		t.Errorf("Expected 0, got %d", outI)
+	}
+
+	outV, outI = FindClosest(l1, 2)
+	if outV != 2 {
+		t.Errorf("Expected 2, got %d", outV)
+	}
+
+	if outI != 1 {
+		t.Errorf("Expected 1, got %d", outI)
+	}
+
+	outV, outI = FindClosest(l1, 21)
+	if outV != 22 {
+		t.Errorf("Expected 22, got %d", outV)
+	}
+
+	if outI != 6 {
+		t.Errorf("Expected 6, got %d", outI)
+	}
+
+	outV, outI = FindClosest([]int{}, 5)
+	if outV != -1 {
+		t.Errorf("Expected -1, got %d", outV)
+	}
+
+	if outI != -1 {
+		t.Errorf("Expected -1, got %d", outI)
+	}
+
 }
 
 func TestSplit(t *testing.T) {
@@ -19,6 +131,36 @@ func TestSplit(t *testing.T) {
 	if !b {
 		t.Error("Expected true, got", b)
 	}
+}
+
+func TestSSTF(t *testing.T) {
+
+	f1, e1 := os.Open("./pa2r3.1-rls/pa2r3-rls/sstf01.txt")
+	exf1, e2 := os.Open("./pa2r3.1-rls/pa2r3-rls/sstf01.base")
+	if e1 != nil {
+		f1.Close()
+		log.Fatal(e1)
+	}
+	if e2 != nil {
+		exf1.Close()
+		log.Fatal(e2)
+	}
+	in1 := FileToStr(f1)
+	ex1 := FileToStr(exf1)
+
+	inS1 := strings.Split(in1, "\n")
+
+	inS1 = RemoveComments(inS1)
+
+	p1, _ := Parse(inS1)
+
+	out1 := ParamsToString(p1)
+	out1 += Run(p1)
+	//fmt.Printf("%s\n", Run(p1))
+	if out1 != ex1 {
+		t.Errorf("Expected\n%s got\n%s", ex1, out1)
+	}
+
 }
 
 func TestPares(t *testing.T) {
