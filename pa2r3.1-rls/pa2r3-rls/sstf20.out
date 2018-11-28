@@ -24,8 +24,6 @@ Seek algorithm: SSTF
 		Cylinder  2918
 		Cylinder  2503
 Servicing  1192
-Servicing   930
-Servicing   198
 Servicing  1263
 Servicing  1347
 Servicing  1677
@@ -43,4 +41,6 @@ Servicing  4107
 Servicing  4148
 Servicing  4195
 Servicing  4706
-SSTF traversal count =  5510
+Servicing   930
+Servicing   198
+SSTF traversal count =  8030
