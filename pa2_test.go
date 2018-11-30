@@ -54,6 +54,27 @@ func TestCalcTrav(t *testing.T) {
 	}
 }
 
+func TestEqual(t *testing.T){
+	var a []int= []int{1,2,3,4,5,6,7,8,9}
+	var b []int= []int{1,2,4,5,6,7,8,9}
+	var c []int= []int{1,2,3,4,5,11,7,8,9}
+	r1 := Equal(a,a)
+	
+	if !r1{
+		t.Errorf("Expected true, got %t", r1)
+	}
+
+	r2:= Equal(a,b)
+	if r2{
+		t.Errorf("Expected false, got %t", r2)
+	}
+
+	r3 := Equal(a,c)
+	if r3{
+		t.Errorf("Expected false, got %t", r3)
+	}
+}
+
 func TestFCFS(t *testing.T) {
 	var out string = FCFS(fcfs1)
 	var exp string = "Servicing   300\nServicing   200\nServicing   100\nServicing   450\nServicing  2500\nServicing    38\nFCFS traversal count =  5335\n"
@@ -125,9 +146,49 @@ func TestFindClosest(t *testing.T) {
 
 }
 
+func TestRemoveElementInt(t *testing.T){
+	var list []int= []int{0,1,2,3,4,5,6,7,8,9}
+
+	var remove []int = RemoveElementInt(list, 5)
+
+	var exp []int = []int{0,1,2,3,4,6,7,8,9}
+
+	if len(exp) != len(remove){
+		t.Errorf("Lengths not equal. Expected %d, got %d", len(exp), len(remove))
+	}
+
+	if !Equal(remove, exp){
+		t.Errorf("Expected %v, got %v", exp, remove)	
+	}
+}
+
+func TestSCAN(t *testing.T){
+	f1,e1:= os.Open("./pa2r3.1-rls/pa2r3-rls/scan20.base")
+	inf1, e2 := os.Open("./pa2r3.1-rls/pa2r3-rls/scan20.txt")
+	if e1 != nil{
+		f1.Close()
+		log.Fatal(e1)
+	}
+	if e2 != nil{
+		inf1.Close()
+		log.Fatal(e2)
+	}
+
+	exp := FileToStr(f1)
+	inS := FileToStr(inf1)
+	inLines := strings.Split(inS, "\n")
+	inLines = RemoveComments(inLines)
+	p, _:= Parse(inLines)
+	out:= ParamsToString(p)
+	out += Run(p)
+
+	if exp != out{
+		t.Errorf("Expected:\n%s, got:\n%s",exp , out)
+	}
+}
+
 func TestSplit(t *testing.T) {
-	var b bool
-	b = Split(' ') && Split('\n') && Split('\t') && Split('\r') && !Split('z')
+	var b bool = Split(' ') && Split('\n') && Split('\t') && Split('\r') && !Split('z')
 	if !b {
 		t.Error("Expected true, got", b)
 	}
@@ -190,7 +251,7 @@ func TestPares(t *testing.T) {
 	outS := ParamsToString(out)
 
 	if exS != outS {
-		t.Errorf("Expected %s , got\n", exS, outS)
+		t.Errorf("Expected %s , got %s\n", exS, outS)
 	}
 }
 
@@ -220,7 +281,7 @@ func TestRun(t *testing.T) {
 	out := Run(perams)
 
 	if exp != out {
-		t.Errorf("Expected %s , got\n", exp, out)
+		t.Errorf("Expected\n %s , got\n%s", exp, out)
 	}
 
 }

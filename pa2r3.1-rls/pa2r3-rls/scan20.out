@@ -1,4 +1,4 @@
-Seek algorithm: SSTF
+Seek algorithm: SCAN
 	Lower cylinder:     0
 	Upper cylinder: 12000
 	Init cylinder:   1200
@@ -23,7 +23,6 @@ Seek algorithm: SSTF
 		Cylinder  1263
 		Cylinder  2918
 		Cylinder  2503
-Servicing  1192
 Servicing  1263
 Servicing  1347
 Servicing  1677
@@ -41,6 +40,7 @@ Servicing  4107
 Servicing  4148
 Servicing  4195
 Servicing  4706
+Servicing  1192
 Servicing   930
 Servicing   198
-SSTF traversal count =  8030
+SCAN traversal count = 22602

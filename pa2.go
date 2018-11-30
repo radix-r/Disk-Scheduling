@@ -30,6 +30,7 @@ import (
 	"sort"
 	"strconv"
 	"strings"
+	"container/list"
 )
 
 /*
@@ -59,7 +60,7 @@ stop
 func CalcTrav(req []int, start int) (int, string) {
 	var at int = start
 	var trav int = 0
-	var out string = ""
+	var out string
 
 	for _, cyl := range req {
 		out += fmt.Sprintf("Servicing %5d\n", cyl)
@@ -68,6 +69,23 @@ func CalcTrav(req []int, start int) (int, string) {
 		at = cyl
 	}
 	return trav, out
+	//return -1, "-1"
+}
+
+/*
+Equal tells whether a and b contain the same elements.
+A nil argument is equivalent to an empty slice.
+*/
+func Equal(a, b []int) bool {
+    if len(a) != len(b) {
+        return false
+    }
+    for i, v := range a {
+        if v != b[i] {
+            return false
+        }
+    }
+    return true
 }
 
 //
@@ -113,14 +131,14 @@ func FindClosest(nums []int, target int) (int, int) {
 	// original index of the 0th item in temp
 	var i int = 0
 	var val int = -1
-
+ 
 	for len(temp) > 2 {
 		var mid int = (len(temp) - 1) / 2
 		//fmt.Printf("%d : %d\n", mid, temp[mid])
 		if temp[mid] == target {
 			return target, (i + mid)
 		} else if temp[mid] > target {
-			temp = temp[:mid]
+			temp = temp[:mid+1] // +1 to include the last one
 		} else {
 			i = i + mid
 			temp = temp[mid:]
@@ -150,6 +168,9 @@ func FindClosest(nums []int, target int) (int, int) {
 	return val, i
 }
 
+/*
+returns the contents of paramiters struct as a string
+*/
 func ParamsToString(params parameters) string {
 	var out string
 
@@ -210,8 +231,7 @@ func Parse(lines []string) (parameters, int) {
 				} else {
 					// unrecognized token
 					state = 7
-				}
-				break
+				}			
 			case 1:
 				if ValidAlg(token) {
 					alg = token
@@ -268,6 +288,8 @@ func Parse(lines []string) (parameters, int) {
 		return p, -1
 	}
 
+	//Check inputs are valid
+
 	//assign values to p
 	p.alg = alg
 	p.lowerCYL = lower
@@ -290,26 +312,120 @@ func RemoveComments(lines []string) []string {
 	return lines
 }
 
+func RemoveElementInt(sl []int,i int)[]int{
+	// Remove the element at index i from cpy.
+	copy(sl[i:], sl[i+1:]) // Shift a[i+1:] left one index.
+	sl[len(sl)-1] = -1     // Erase last element (write zero value).
+	sl=sl[:len(sl)-1]   // Truncate slice.
+	return sl
+}
+
 func Run(p parameters) string {
 
 	var output string = ""
 	// determine which alg to use
-	// maybe use code of alg
+	// maybe use code of alg 
 	if p.alg == "fcfs" {
 		output = FCFS(p)
 	} else if p.alg == "sstf" {
 		output = SSTF(p)
+	} else if p.alg =="scan"{
+		output = SCAN(p)
+
 	}
 
 	return output
 }
 
+/*
+like an elevator. starts at init and goes up all the way to the top then back down
+*/
+func SCAN(p parameters) string{
+	
+
+	//var current *Element 
+	//var next int = -1
+	var traversal int = 0  
+	var up bool = true // direction that scan is going. true for up false for down
+	//var index int = 0
+	var out string = ""
+	var reqList = list.New()
+	reqList.Init()
+
+	// sort requests
+	cpy := p.requests
+	sort.Ints(cpy)
+
+
+
+	// find next elem larger than init. start at copy[0]
+	for _, req := range cpy{
+		reqList.PushBack(req)
+	} 
+	
+	current := reqList.Back()
+
+	for e := reqList.Front(); e != nil; e = e.Next() {
+		if e.Value.(int) >= p.initCYL{
+			current = e
+			//traversal += 
+			break
+		}
+	}
+
+	//calculate inital traversal from start to next req
+	out += fmt.Sprintf("Servicing %5d\n", current.Value)
+
+	if current.Value.(int) < p.initCYL{
+		traversal += Abs(current.Value.(int)-p.initCYL) + p.upperCYL-p.initCYL
+	}else{
+		traversal += Abs(current.Value.(int)-p.initCYL)
+	}
+
+
+	
+
+	// remove elements larger than init. once all larger items remove add max - prev + max - next to traversal
+	// find next and subtract distance
+	
+	for reqList.Len() > 1{
+		old := current
+		if up{
+			if current == reqList.Back() {
+				// reached top of disk
+				up = !up
+				traversal += 2*Abs(current.Value.(int) - p.upperCYL)
+				current = current.Prev()
+				
+			}else{ // normal uppward operation
+				current= current.Next()
+				
+			}
+		}else{
+			if current == reqList.Front(){ // reached bottem 
+				up = !up
+				traversal += 2*Abs(current.Value.(int) - p.lowerCYL)
+				current = current.Next()
+			}else{ // normal downward operation
+				current = current.Prev()
+
+			}
+		}
+		traversal += Abs(current.Value.(int)-old.Value.(int))
+		out += fmt.Sprintf("Servicing %5d\n", current.Value)
+		reqList.Remove(old)
+		
+	}
+	
+	out += fmt.Sprintf("SCAN traversal count = %5d\n", traversal)
+	return out
+}
 /**/
 func Split(r rune) bool {
 	return r == ' ' || r == '\n' || r == '\t' || r == '\r' //|| r == '\n\r'
 }
 
-func SSTF(p parameters) string {
+func SSTF(p parameters) string { 
 	var output string = ""
 	var prev int = p.initCYL
 	var trav int
