@@ -489,8 +489,15 @@ func Parse(lines []string) (parameters, int) {
 					log.Fatal(err)
 				}
 
-				// add to requests array
-				req = append(req, i)
+				if i <= upper && i >= lower{
+					// add to requests array
+					req = append(req, i)
+				}else{
+					fmt.Printf("ERROR(15):Request out of bounds: req (%d) > upper (%d) or  < lower (%d)\n",i,upper,lower)
+				}
+
+
+				
 
 			case 7:
 				state = -1
@@ -505,12 +512,26 @@ func Parse(lines []string) (parameters, int) {
 		}
 	}
 
+	//Check inputs are valid
+	state = -1
+	if init > upper{
+		fmt.Printf("ABORT(11):initial (%d) > upper (%d)\n", init, upper)
+		
+	}else if init < lower{
+		fmt.Printf("ABORT(12):initial (%d) < lower (%d)\n", init, lower)
+
+	}else if upper < lower{
+		fmt.Printf("ABORT(13):upper (%d) < lower (%d)\n", upper, lower)
+	}else { // all clear
+		state = 0
+	}
+
 	if state == -1 {
 		// error encountered
 		return p, -1
 	}
 
-	//Check inputs are valid
+	
 
 	//assign values to p
 	p.alg = alg
