@@ -1,4 +1,4 @@
-Seek algorithm: SCAN
+Seek algorithm: C-SCAN
 	Lower cylinder:     0
 	Upper cylinder: 12000
 	Init cylinder:   1200
@@ -40,7 +40,7 @@ Servicing  4107
 Servicing  4148
 Servicing  4195
 Servicing  4706
-Servicing  1192
-Servicing   930
 Servicing   198
-SCAN traversal count = 22602
+Servicing   930
+Servicing  1192
+C-SCAN traversal count = 23992

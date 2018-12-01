@@ -73,6 +73,79 @@ func CalcTrav(req []int, start int) (int, string) {
 }
 
 /*
+similar to scan but jumps to begining if top of disk reached
+*/
+func CSCAN(p parameters)string{
+	//var current *Element 
+	//var next int = -1
+	var traversal int = 0  
+	//var up bool = true // direction that scan is going. true for up false for down
+	//var index int = 0
+	var out string = ""
+	var reqList = list.New()
+	reqList.Init()
+
+	// sort requests
+	cpy := p.requests
+	sort.Ints(cpy)
+
+
+
+	// find next elem larger than init. start at copy[0]
+	for _, req := range cpy{
+		reqList.PushBack(req)
+	} 
+	
+	current := reqList.Back()
+
+	for e := reqList.Front(); e != nil; e = e.Next() {
+		if e.Value.(int) >= p.initCYL{
+			current = e
+			
+			break
+		}
+	}
+
+	//calculate inital traversal from start to next req
+	out += fmt.Sprintf("Servicing %5d\n", current.Value)
+
+	if current.Value.(int) < p.initCYL{
+		traversal += Abs(current.Value.(int)-p.initCYL) + p.upperCYL-p.initCYL
+	}else{
+		traversal += Abs(current.Value.(int)-p.initCYL)
+	}
+
+
+	
+
+	// find next and subtract distance
+	
+	for reqList.Len() > 1{
+		old := current
+		
+			if current == reqList.Back() {
+				// reached top of disk go to bottem
+				traversal += 2* Abs(p.upperCYL - current.Value.(int))
+				current = reqList.Front()
+				traversal += 2* Abs(current.Value.(int)-p.lowerCYL)
+				
+			}else{ // normal uppward operation
+				current= current.Next()
+				
+			}
+		
+		traversal += Abs(current.Value.(int)-old.Value.(int))
+		out += fmt.Sprintf("Servicing %5d\n", current.Value)
+		reqList.Remove(old)
+		
+	}
+	
+	out += fmt.Sprintf("C-SCAN traversal count = %5d\n", traversal)
+	return out
+}
+
+
+/*
 Equal tells whether a and b contain the same elements.
 A nil argument is equivalent to an empty slice.
 */
@@ -331,7 +404,8 @@ func Run(p parameters) string {
 		output = SSTF(p)
 	} else if p.alg =="scan"{
 		output = SCAN(p)
-
+	}else if p.alg =="c-scan"{
+		output = CSCAN(p)
 	}
 
 	return output

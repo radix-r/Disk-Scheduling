@@ -255,6 +255,7 @@ func TestPares(t *testing.T) {
 	}
 }
 
+/*
 func TestRun(t *testing.T) {
 	var in []string = []string{
 		"use c-scan",
@@ -285,3 +286,4 @@ func TestRun(t *testing.T) {
 	}
 
 }
+*/
