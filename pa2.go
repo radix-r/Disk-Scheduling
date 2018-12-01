@@ -72,6 +72,75 @@ func CalcTrav(req []int, start int) (int, string) {
 	//return -1, "-1"
 }
 
+func Clook (p parameters)string{
+	//var current *Element 
+	//var next int = -1
+	var traversal int = 0  
+	//var index int = 0
+	var out string = ""
+	var reqList = list.New()
+	reqList.Init()
+
+	// sort requests
+	cpy := p.requests
+	sort.Ints(cpy)
+
+
+
+	// find next elem larger than init. start at copy[0]
+	for _, req := range cpy{
+		reqList.PushBack(req)
+	} 
+	
+	current := reqList.Back()
+
+	for e := reqList.Front(); e != nil; e = e.Next() {
+		if e.Value.(int) >= p.initCYL{
+			current = e
+			//traversal += 
+			break
+		}
+	}
+
+	//calculate initial traversal from start to next req
+	out += fmt.Sprintf("Servicing %5d\n", current.Value)
+
+	if current.Value.(int) < p.initCYL{
+		traversal += Abs(current.Value.(int)-p.initCYL) + p.upperCYL-p.initCYL
+	}else{
+		traversal += Abs(current.Value.(int)-p.initCYL)
+	}
+
+
+	
+
+	// remove elements larger than init. once all larger items remove add max - prev + max - next to traversal
+	// find next and subtract distance
+	
+	for reqList.Len() > 1{
+		old := current
+		
+			if current == reqList.Back() {
+				// reached top of disk
+				
+				
+				current = reqList.Front()
+				
+			}else{ // normal uppward operation
+				current= current.Next()
+				
+			}
+		
+		traversal += Abs(current.Value.(int)-old.Value.(int))
+		out += fmt.Sprintf("Servicing %5d\n", current.Value)
+		reqList.Remove(old)
+		
+	}
+	
+	out += fmt.Sprintf("C-LOOK traversal count = %5d\n", traversal)
+	return out
+}
+
 /*
 similar to scan but jumps to begining if top of disk reached
 */
@@ -241,6 +310,86 @@ func FindClosest(nums []int, target int) (int, int) {
 	return val, i
 }
 
+func Look(p parameters)string{
+
+	//var current *Element 
+	//var next int = -1
+	var traversal int = 0  
+	var up bool = true // direction that scan is going. true for up false for down
+	//var index int = 0
+	var out string = ""
+	var reqList = list.New()
+	reqList.Init()
+
+	// sort requests
+	cpy := p.requests
+	sort.Ints(cpy)
+
+
+
+	// find next elem larger than init. start at copy[0]
+	for _, req := range cpy{
+		reqList.PushBack(req)
+	} 
+	
+	current := reqList.Back()
+
+	for e := reqList.Front(); e != nil; e = e.Next() {
+		if e.Value.(int) >= p.initCYL{
+			current = e
+			//traversal += 
+			break
+		}
+	}
+
+	//calculate initial traversal from start to next req
+	out += fmt.Sprintf("Servicing %5d\n", current.Value)
+
+	if current.Value.(int) < p.initCYL{
+		traversal += Abs(current.Value.(int)-p.initCYL) + p.upperCYL-p.initCYL
+	}else{
+		traversal += Abs(current.Value.(int)-p.initCYL)
+	}
+
+
+	
+
+	// remove elements larger than init. once all larger items remove add max - prev + max - next to traversal
+	// find next and subtract distance
+	
+	for reqList.Len() > 1{
+		old := current
+		if up{
+			if current == reqList.Back() {
+				// reached top of disk
+				up = !up
+				
+				current = current.Prev()
+				
+			}else{ // normal uppward operation
+				current= current.Next()
+				
+			}
+		}else{
+			if current == reqList.Front(){ // reached bottem 
+				up = !up
+				
+				current = current.Next()
+			}else{ // normal downward operation
+				current = current.Prev()
+
+			}
+		}
+		traversal += Abs(current.Value.(int)-old.Value.(int))
+		out += fmt.Sprintf("Servicing %5d\n", current.Value)
+		reqList.Remove(old)
+		
+	}
+	
+	out += fmt.Sprintf("LOOK traversal count = %5d\n", traversal)
+	return out
+}
+
 /*
 returns the contents of paramiters struct as a string
 */
@@ -406,6 +555,10 @@ func Run(p parameters) string {
 		output = SCAN(p)
 	}else if p.alg =="c-scan"{
 		output = CSCAN(p)
+	}else if p.alg =="look"{
+		output = Look(p)
+	} else if p.alg == "c-look"{
+		output = Clook(p)
 	}
 
 	return output
@@ -447,7 +600,7 @@ func SCAN(p parameters) string{
 		}
 	}
 
-	//calculate inital traversal from start to next req
+	//calculate initial traversal from start to next req
 	out += fmt.Sprintf("Servicing %5d\n", current.Value)
 
 	if current.Value.(int) < p.initCYL{
